@@ -1,0 +1,44 @@
+name: Daily Email Reminder for Labeled Tasks
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Запуск каждый день в 9:00 утра по UTC
+
+jobs:
+  send_email_reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Labeled Issues
+        id: check_issues
+        uses: actions/github-script@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const issues = await github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'Due Soon', 
+            });
+            core.setOutput("issues", JSON.stringify(issues.data));
+
+      - name: Send Email
+        if: steps.check_issues.outputs.issues != '[]'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Напоминание о задачах с меткой 'Due Soon'"
+          to: ${{ secrets.TO_EMAIL }}
+          from: ${{ secrets.EMAIL_USER }}
+          content_type: text/html
+          body: |
+            <h2>Напоминание о задачах на GitHub с меткой 'Due Soon'</h2>
+            <p>Следующие задачи требуют вашего внимания:</p>
+            <ul>
+              {% for issue in steps.check_issues.outputs.issues %}
+                <li><strong>{{ issue.title }}</strong> - <a href="{{ issue.html_url }}">Посмотреть задачу</a></li>
+              {% endfor %}
+            </ul>
