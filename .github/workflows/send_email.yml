@@ -18,17 +18,5 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: |
           echo "Отправка тестового уведомления по email..."
-          python -c "
-import smtplib
-from email.mime.text import MIMEText
+          python -c "import smtplib; from email.mime.text import MIMEText; msg = MIMEText('Это тестовое уведомление для проверки работы email.'); msg['Subject'] = 'Проверка уведомлений'; msg['From'] = '${{ secrets.EMAIL_USER }}'; msg['To'] = '${{ secrets.TO_EMAIL }}'; with smtplib.SMTP('${{ secrets.SMTP_SERVER }}', int('${{ secrets.SMTP_PORT }}')) as server: server.starttls(); server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}'); server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())"
 
-msg = MIMEText('Это тестовое уведомление для проверки работы email.')
-msg['Subject'] = 'Проверка уведомлений'
-msg['From'] = '${{ secrets.EMAIL_USER }}'
-msg['To'] = '${{ secrets.TO_EMAIL }}'
-
-with smtplib.SMTP('${{ secrets.SMTP_SERVER }}', int('${{ secrets.SMTP_PORT }}')) as server:
-    server.starttls()
-    server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}')
-    server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())
-          "
