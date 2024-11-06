@@ -1,13 +1,11 @@
 name: Send Email Notification
 
-# Этот workflow запускается вручную
 on:
   workflow_dispatch:
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
-
     steps:
       - name: Send email notification
         env:
@@ -18,5 +16,21 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: |
           echo "Отправка тестового уведомления по email..."
-          python -c "import smtplib; from email.mime.text import MIMEText; msg = MIMEText('Это тестовое уведомление для проверки работы email.'); msg['Subject'] = 'Проверка уведомлений'; msg['From'] = '${{ secrets.EMAIL_USER }}'; msg['To'] = '${{ secrets.TO_EMAIL }}'; with smtplib.SMTP('${{ secrets.SMTP_SERVER }}', int('${{ secrets.SMTP_PORT }}')) as server: server.starttls(); server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}'); server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())"
+          python - <<'EOF'
+import smtplib
+from email.mime.text import MIMEText
 
+msg = MIMEText('Это тестовое уведомление для проверки работы email.')
+msg['Subject'] = 'Проверка уведомлений'
+msg['From'] = '${{ secrets.EMAIL_USER }}'
+msg['To'] = '${{ secrets.TO_EMAIL }}'
+
+try:
+    with smtplib.SMTP('${{ secrets.SMTP_SERVER }}', int('${{ secrets.SMTP_PORT }}')) as server:
+        server.starttls()
+        server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}')
+        server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())
+    print("Email sent successfully.")
+except Exception as e:
+    print(f"Error sending email: {e}")
+EOF
