@@ -32,7 +32,18 @@ jobs:
           password $EMAIL_PASSWORD
           from $EMAIL_USER
           tls on
+          logfile ~/.msmtp.log
           " > ~/.msmtprc
+
+          # Установим права доступа к файлу конфигурации
+          chmod 600 ~/.msmtprc
+
+          # Проверим настройки msmtp
+          cat ~/.msmtprc
 
           # Отправим email
           echo -e "Subject: Проверка уведомлений\n\nЭто тестовое напоминание." | msmtp $TO_EMAIL
+
+          # Проверим лог msmtp для отладки
+          cat ~/.msmtp.log
+
