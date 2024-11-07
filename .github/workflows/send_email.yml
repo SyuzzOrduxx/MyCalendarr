@@ -17,9 +17,8 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: |
           echo "Отправка тестового уведомления по email..."
-          python <<EOF
+          python3 -c "
 import smtplib
-from email.mime.text import MIMEText
 
 msg = MIMEText('Это тестовое уведомление для проверки работы email.')
 msg['Subject'] = 'Проверка уведомлений'
@@ -31,10 +30,11 @@ try:
         server.starttls()
         server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}')
         server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())
-    print("Уведомление отправлено успешно")
+    print('Уведомление отправлено успешно')
 except Exception as e:
-    print(f"Ошибка при отправке уведомления: {e}")
-EOF
+    print(f'Ошибка при отправке уведомления: {e}')
+"
+
 
 
 
