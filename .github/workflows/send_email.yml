@@ -6,6 +6,7 @@ on:
 jobs:
   send-email:
     runs-on: ubuntu-latest
+
     steps:
       - name: Send email notification
         env:
@@ -30,7 +31,9 @@ try:
         server.starttls()
         server.login('${{ secrets.EMAIL_USER }}', '${{ secrets.EMAIL_PASSWORD }}')
         server.sendmail('${{ secrets.EMAIL_USER }}', '${{ secrets.TO_EMAIL }}', msg.as_string())
-    print("Email sent successfully.")
+    print("Уведомление отправлено успешно")
 except Exception as e:
-    print(f"Error sending email: {e}")
+    print(f"Ошибка при отправке уведомления: {e}")
 EOF
+
+
