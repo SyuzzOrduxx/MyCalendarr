@@ -3,6 +3,7 @@ name: Daily Email Reminder for Labeled Tasks
 on:
   schedule:
     - cron: '0 9 * * *'  # Запуск каждый день в 9:00 утра по UTC
+  workflow_dispatch:       # Allows manual run from the Actions tab
 
 jobs:
   send_email_reminder:
@@ -42,4 +43,6 @@ jobs:
                 <li><strong>{{ issue.title }}</strong> - <a href="{{ issue.html_url }}">Посмотреть задачу</a></li>
               {% endfor %}
             </ul>
+
+          
 
