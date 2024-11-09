@@ -1,7 +1,7 @@
 name: Daily Email Reminder for Labeled Tasks
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   schedule:
     - cron: '0 9 * * *'  # Запуск каждый день в 9:00 утра по UTC
 
