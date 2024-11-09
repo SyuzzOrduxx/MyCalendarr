@@ -1,7 +1,6 @@
 name: Daily Email Reminder for Labeled Tasks
 
 on:
-  workflow_dispatch
   schedule:
     - cron: '0 9 * * *'  # Запуск каждый день в 9:00 утра по UTC
 
@@ -19,7 +18,7 @@ jobs:
             const issues = await github.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: 'Due Soon', 
+              labels: 'Due Soon', // Или другая метка для задач, по которым нужны напоминания
             });
             core.setOutput("issues", JSON.stringify(issues.data));
 
@@ -43,3 +42,4 @@ jobs:
                 <li><strong>{{ issue.title }}</strong> - <a href="{{ issue.html_url }}">Посмотреть задачу</a></li>
               {% endfor %}
             </ul>
+
