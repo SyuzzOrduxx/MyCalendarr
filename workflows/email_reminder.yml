@@ -1,7 +1,6 @@
 name: Daily Email Reminder for Labeled Tasks
 
 on:
-  workflow_dispatch:  # Событие для ручного запуска
   schedule:
     - cron: '0 9 * * *'  # Запуск каждый день в 9:00 утра по UTC
 
@@ -21,17 +20,10 @@ jobs:
               repo: context.repo.repo,
               labels: 'Due Soon', 
             });
-            if (issues.data.length === 0) {
-              core.setOutput("issues", null);
-            } else {
-              const issueList = issues.data.map(issue => {
-                return `<li><strong>${issue.title}</strong> - <a href="${issue.html_url}">Посмотреть задачу</a></li>`;
-              }).join('');
-              core.setOutput("issues", issueList);
-            }
+            core.setOutput("issues", JSON.stringify(issues.data));
 
       - name: Send Email
-        if: steps.check_issues.outputs.issues
+        if: steps.check_issues.outputs.issues != '[]'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
@@ -46,6 +38,7 @@ jobs:
             <h2>Напоминание о задачах на GitHub с меткой 'Due Soon'</h2>
             <p>Следующие задачи требуют вашего внимания:</p>
             <ul>
-              ${{ steps.check_issues.outputs.issues }}
+              {% for issue in steps.check_issues.outputs.issues %}
+                <li><strong>{{ issue.title }}</strong> - <a href="{{ issue.html_url }}">Посмотреть задачу</a></li>
+              {% endfor %}
             </ul>
-
